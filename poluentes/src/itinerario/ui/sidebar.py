@@ -1,27 +1,13 @@
-from dataclasses import dataclass
-
 import streamlit as st
 
 from itinerario.etl.pipeline import IngestionResult
 
 
-@dataclass(frozen=True)
-class SidebarState:
-    days: int
-    refresh_requested: bool
-
-
-def render_sidebar(period_options: tuple[int, ...]) -> SidebarState:
+def render_sidebar() -> bool:
+    """Desenha a barra lateral; devolve True quando pedem para atualizar os dados."""
     with st.sidebar:
         st.header("Itinerário · Ar")
-        days = st.radio(
-            "Período",
-            options=list(period_options),
-            index=len(period_options) - 1,
-            format_func=lambda value: f"{value} dias",
-        )
-        refresh = st.button("Atualizar dados agora", type="primary", width="stretch")
-    return SidebarState(days=int(days), refresh_requested=refresh)
+        return st.button("Atualizar dados agora", type="primary", width="stretch")
 
 
 def render_refresh_feedback(outcome: IngestionResult | str) -> None:

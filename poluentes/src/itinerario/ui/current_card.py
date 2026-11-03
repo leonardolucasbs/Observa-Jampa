@@ -2,15 +2,14 @@ import streamlit as st
 
 from itinerario.domain.aqi import EPA_BANDS
 from itinerario.services.air_quality_service import CurrentAirQuality
-
-DARK_TEXT_BANDS = {"Boa", "Moderada", "Ruim p/ sensíveis"}
+from itinerario.ui.theme import text_color_on
 
 
 def render_current_card(current: CurrentAirQuality | None) -> None:
     if current is None:
         st.info("Ainda não há dados para a localização principal. Rode o backfill ou clique em “Atualizar dados agora”.")
         return
-    text_color = "#111111" if current.band.label in DARK_TEXT_BANDS else "#ffffff"
+    text_color = text_color_on(current.band.label)
     aqi_text = "—" if current.us_aqi is None else str(current.us_aqi)
     st.markdown(
         f"""

@@ -34,6 +34,7 @@ class DashboardConfig:
     cache_ttl_seconds: int
     attribution: str
     disclaimer: str
+    plain_disclaimer: str
 
 
 @dataclass(frozen=True)
@@ -76,6 +77,7 @@ def _build_settings(raw: dict[str, Any], base_dir: Path) -> Settings:
             cache_ttl_seconds=raw["dashboard"]["cache_ttl_seconds"],
             attribution=raw["dashboard"]["attribution"],
             disclaimer=raw["dashboard"]["disclaimer"],
+            plain_disclaimer=raw["dashboard"]["plain_disclaimer"],
         ),
         locations=locations,
     )

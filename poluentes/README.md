@@ -36,6 +36,17 @@ uv run pytest
 
 As quatro localizações vão numa única requisição, com as coordenadas separadas por vírgula. Erros de rede (timeout, 429 e 5xx) têm 3 tentativas com backoff exponencial. Se mesmo assim falhar, o script registra o erro no log e sai com código 1. O dashboard só lê o banco, então nunca quebra por falha de rede, e o botão "Atualizar dados agora" mostra o erro na barra lateral.
 
+## O dashboard
+
+A tela tem duas abas:
+
+- **Resumo** (aberta por padrão) é para quem não é da área. Responde em linguagem simples: *o ar está bom agora?* (cartão colorido com escala de 0 a 500), *como foi nos últimos dias?* (calendário) e *como estão as outras capitais?*.
+- **Detalhes técnicos** traz os gráficos em µg/m³ (tendência com diretrizes da OMS, padrão por hora, comparativo e mapa).
+
+Os textos em linguagem simples de cada faixa ficam em `domain/guidance.py`. No `config.toml`, `plain_disclaimer` é o aviso sobre a origem dos dados que aparece no Resumo.
+
+As cores e a fonte da interface ficam em `.streamlit/config.toml` (tema claro, azul `#1D4899` como cor principal). O Streamlit lê esse arquivo a partir da pasta onde o `streamlit run` é executado, então rode o dashboard de dentro de `poluentes/`.
+
 ## Agendar a coleta horária no Windows
 
 O `scripts\coletar.bat` roda a coleta e grava o log em `logs\coleta.log`.
@@ -99,6 +110,7 @@ O que já existe não precisa mudar.
 
 - Diretrizes da OMS (2021) para média de 24 h: PM2.5 = 15 µg/m³ e NO₂ = 25 µg/m³. O gráfico compara com a **média diária**, não com o valor horário.
 - Faixas e cores EPA do US AQI: 0–50 Boa, 51–100 Moderada, 101–150 Ruim p/ sensíveis, 151–200 Ruim, 201–300 Muito ruim, 301+ Perigosa.
+- No calendário do Resumo, a cor de cada dia é a **mediana das classificações** horárias: cada hora observada recebe uma faixa EPA e o dia fica com a faixa do meio. Um dia completo tem 24 horas; se as duas faixas do meio forem diferentes, vale a pior.
 
 ## Atribuição
 

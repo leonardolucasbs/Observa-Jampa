@@ -49,6 +49,11 @@ def load_city_comparison(pollutant: str, days: int) -> pd.DataFrame:
     return get_container().air_quality_service.city_comparison(pollutant, days)
 
 
+@st.cache_data(ttl=CACHE_TTL_SECONDS, show_spinner=False)
+def load_daily_aqi(slug: str, days: int) -> pd.DataFrame:
+    return get_container().air_quality_service.daily_aqi(slug, days)
+
+
 def has_data() -> bool:
     return get_container().air_quality_service.has_data()
 

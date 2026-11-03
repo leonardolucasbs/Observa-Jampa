@@ -25,6 +25,7 @@ period_options = [7, 30, 90]
 cache_ttl_seconds = 300
 attribution = "Dados de qualidade do ar: Open-Meteo, CAMS / Copernicus Atmosphere Monitoring Service — licença CC BY 4.0"
 disclaimer = "Os valores são estimativas do modelo de previsão CAMS (resolução de dezenas de km), não medições de sensores locais."
+plain_disclaimer = "É uma estimativa para a cidade como um todo, feita por um modelo de previsão (CAMS / Copernicus). Não é a medição de um sensor no seu bairro."
 
 [[locations]]
 slug = "joao-pessoa"

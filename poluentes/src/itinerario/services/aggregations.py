@@ -22,6 +22,18 @@ def daily_means(frame: pd.DataFrame, pollutants: Sequence[str]) -> pd.DataFrame:
     return frame[columns].astype(float).groupby(days).mean()
 
 
+def daily_median(frame: pd.DataFrame, column: str) -> pd.DataFrame:
+    """Mediana diária de `column` e quantas horas têm dado.
+
+    Com número par de valores, fica o maior dos dois do meio (a mediana é sempre um valor observado).
+    """
+    if frame.empty:
+        return pd.DataFrame(index=pd.DatetimeIndex([], name="date"), columns=["median", "hours"], dtype=float)
+    days = pd.to_datetime(frame["measured_at"]).dt.normalize().rename("date")
+    grouped = frame[column].astype(float).groupby(days)
+    return pd.DataFrame({"median": grouped.quantile(0.5, interpolation="higher"), "hours": grouped.count()})
+
+
 def period_mean_by_location(frame: pd.DataFrame, pollutant: str) -> pd.DataFrame:
     if frame.empty:
         return pd.DataFrame(columns=["slug", "name", pollutant])

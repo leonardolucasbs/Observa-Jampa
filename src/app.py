@@ -9,10 +9,11 @@ import streamlit as st
 
 st.set_page_config(page_title="ObservaJP", layout="wide")
 
-PAGES = {
-    "Meio ambiente": [
-        st.Page("pages/poluentes/page.py", title="Poluentes", icon="🌫️", url_path="poluentes", default=True),
-    ],
-}
+# A ordem da lista é a ordem da barra de navegação no topo da tela.
+PAGES = [
+    st.Page("pages/inicio/page.py", title="Início", icon="🏠", url_path="inicio", default=True),
+    st.Page("pages/poluentes/page.py", title="Poluentes", icon="🌫️", url_path="poluentes"),
+    st.Page("pages/pontos_descarte/page.py", title="Pontos de descarte", icon="♻️", url_path="pontos_descarte"),
+]
 
-st.navigation(PAGES).run()
+st.navigation(PAGES, position="top").run()

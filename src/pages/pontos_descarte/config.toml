@@ -1,0 +1,58 @@
+log_level = "INFO"
+
+[data]
+# Caminhos relativos a esta pasta (src/pages/pontos_descarte).
+spreadsheet = "data/pontos_descarte_eletroeletronicos_coordenadas_1.xlsx"
+sheet = "Pontos"
+points = "data/pontos_descarte.json"
+city_boundary = "data/limite_joao_pessoa.geojson"
+
+[http]
+timeout_seconds = 15
+retries = 2
+backoff_factor = 0.5
+# Os serviços públicos do OpenStreetMap exigem um User-Agent que identifique o app.
+user_agent = "ObservaJP/0.1 (+https://github.com/leonardolucasbs/Observa-Jampa)"
+
+[geocoding]
+# Nominatim: transforma endereço digitado em coordenada (e coordenada em bairro, no prepare).
+base_url = "https://nominatim.openstreetmap.org"
+city_hint = "João Pessoa, PB"
+# Área de busca: João Pessoa e vizinhos (Cabedelo, Bayeux, Santa Rita). [oeste, norte, leste, sul]
+viewbox = [-35.02, -6.95, -34.77, -7.28]
+min_interval_seconds = 1.1  # política de uso do Nominatim: no máximo 1 requisição por segundo
+
+[routing]
+# OSRM público do FOSSGIS. Para produção com muito acesso, use um OSRM próprio.
+base_url = "https://routing.openstreetmap.de"
+candidates = 5  # quantos pontos mais próximos em linha reta entram na comparação por rota
+
+[routing.profiles]
+# rótulo na tela = serviço no servidor OSRM
+"Carro" = "routed-car"
+"A pé" = "routed-foot"
+"Bicicleta" = "routed-bike"
+
+[boundary]
+# Limite oficial do município (malha territorial do IBGE), destacado em azul no mapa.
+base_url = "https://servicodados.ibge.gov.br/api/v3/malhas/municipios"
+ibge_code = "2507507"  # João Pessoa
+name = "João Pessoa"
+quality = "maxima"  # minima, intermediaria ou maxima (o arquivo de João Pessoa tem cerca de 6 KB)
+
+[search]
+# Quando o bairro/endereço digitado não aparece nos dados, ele é localizado no mapa
+# e entram os pontos dentro deste raio.
+neighborhood_radius_km = 1.5
+address_radius_km = 1.0
+
+[map]
+latitude = -7.12
+longitude = -34.87
+zoom = 11.2
+height = 480
+city_fill_opacity = 0.2  # transparência do azul sobre o município (0 a 1)
+
+[texts]
+attribution = "Pontos de descarte: Google My Maps “Descarte de resíduos eletroeletrônicos em João Pessoa/PB”, com coordenadas conferidas ou geocodificadas. Bairros e endereços complementares, mapa e geocodificação: © colaboradores do OpenStreetMap (ODbL). Rotas: OSRM / FOSSGIS. Limite do município: IBGE, Malha Municipal."
+disclaimer = "As informações vêm de fontes públicas e podem estar desatualizadas. Confirme horário e itens aceitos com o local antes de ir."

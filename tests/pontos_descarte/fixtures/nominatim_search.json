@@ -1,0 +1,28 @@
+[
+  {
+    "place_id": 14549456,
+    "osm_type": "way",
+    "osm_id": 302263823,
+    "lat": "-7.1249869",
+    "lon": "-34.8846817",
+    "category": "highway",
+    "type": "secondary",
+    "place_rank": 26,
+    "importance": 0.05339660410467686,
+    "addresstype": "secondary",
+    "name": "Rua das Trincheiras",
+    "display_name": "Rua das Trincheiras, Centro, João Pessoa, Paraíba, Região Nordeste, 58011-000, Brasil",
+    "address": {
+      "road": "Rua das Trincheiras",
+      "suburb": "Centro",
+      "city_district": "João Pessoa",
+      "city": "João Pessoa",
+      "state": "Paraíba",
+      "ISO3166-2-lvl4": "BR-PB",
+      "region": "Região Nordeste",
+      "postcode": "58011-000",
+      "country": "Brasil",
+      "country_code": "br"
+    }
+  }
+]

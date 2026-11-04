@@ -1,0 +1,33 @@
+{
+  "code": "Ok",
+  "routes": [
+    {
+      "legs": [],
+      "weight_name": "routability",
+      "geometry": {
+        "coordinates": [
+          [
+            -34.844153,
+            -7.09879
+          ],
+          [
+            -34.843915,
+            -7.099979
+          ],
+          [
+            -34.83913,
+            -7.151726
+          ],
+          [
+            -34.841221,
+            -7.149737
+          ]
+        ],
+        "type": "LineString"
+      },
+      "weight": 719,
+      "duration": 719,
+      "distance": 9932.1
+    }
+  ]
+}

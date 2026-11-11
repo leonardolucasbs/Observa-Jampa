@@ -1,0 +1,40 @@
+log_level = "INFO"
+# Fuso de João Pessoa: define "hoje", "amanhã", o período de 7 dias e os horários exibidos.
+timezone = "America/Fortaleza"
+
+[location]
+name = "João Pessoa"
+latitude = -7.1195
+longitude = -34.845
+ibge_code = "2507507"  # usado para saber se um aviso do INMET abrange o município
+
+[http]
+timeout_seconds = 10
+retries = 1
+backoff_factor = 0.5
+user_agent = "ObservaJP/0.1 (+https://github.com/leonardolucasbs/Observa-Jampa)"
+
+[forecast]
+# Open-Meteo Forecast API (https://open-meteo.com/en/docs). Sem chave.
+base_url = "https://api.open-meteo.com/v1/forecast"
+forecast_days = 7
+refresh_seconds = 1800  # nova consulta no máximo a cada 30 min
+max_stale_seconds = 21600  # se a fonte falhar, a última previsão válida aparece (marcada como desatualizada) por até 6 h
+retry_after_failure_seconds = 120  # depois de uma falha, espera 2 min antes de tentar de novo
+
+[alerts]
+# Avisos meteorológicos do INMET. Endpoint público sem documentação formal, validado em 10/11/2026.
+base_url = "https://apiprevmet3.inmet.gov.br/avisos/ativos"
+alert_page_url = "https://avisos.inmet.gov.br/{id}"  # página oficial de cada aviso (campo <web> do CAP)
+source_timezone = "America/Sao_Paulo"  # os horários de início e fim vêm em horário de Brasília, sem fuso explícito
+refresh_seconds = 600  # nova consulta no máximo a cada 10 min
+max_stale_seconds = 7200  # avisos podem mudar a qualquer hora: a lista antiga só aparece por até 2 h
+retry_after_failure_seconds = 120
+
+[ui]
+rerun_seconds = 300  # a tela se redesenha a cada 5 min; as fontes só são consultadas quando o cache vence
+
+[texts]
+rain_disclaimer = "Previsão de um modelo meteorológico para a cidade como um todo. É uma estimativa de chuva, não a chuva medida, e não indica alagamento em ruas específicas."
+alerts_disclaimer = "Avisos oficiais do INMET. Um aviso indica condição meteorológica de risco, não confirma alagamento. A ausência de avisos não significa ausência de risco."
+attribution = "Previsão de chuva: Open-Meteo (CC BY 4.0), consultada pela Forecast API. Avisos meteorológicos: INMET — Instituto Nacional de Meteorologia (reprodução permitida com citação da fonte)."

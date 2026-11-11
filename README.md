@@ -13,9 +13,10 @@ Cada tema ambiental é uma página do app. A barra de navegação fica no topo d
 
 | Página | Situação | Pasta | Fonte dos dados |
 |---|---|---|---|
-| Início (landing page) | Em construção | `src/pages/inicio/` | — |
+| Início (landing page) | Disponível | `src/pages/inicio/` | — |
 | Poluentes (qualidade do ar) | Disponível | [`src/pages/poluentes/`](src/pages/poluentes/README.md) | Open-Meteo / CAMS (Copernicus) |
 | Pontos de descarte de eletroeletrônicos | Disponível | [`src/pages/pontos_descarte/`](src/pages/pontos_descarte/README.md) | Google My Maps colaborativo, OpenStreetMap (Nominatim, OSRM), IBGE (limite do município) |
+| Chuvas e alertas (previsão de chuva e avisos meteorológicos) | Disponível | [`src/pages/chuvas/`](src/pages/chuvas/README.md) | Open-Meteo (previsão), INMET (avisos meteorológicos) |
 | Emissões de gases de efeito estufa | Planejada | — | — |
 | Resíduos sólidos | Planejada | — | — |
 
@@ -54,6 +55,7 @@ Observa-Jampa/
 │   └── pages/
 │       ├── inicio/             página inicial (landing page)
 │       ├── pontos_descarte/    mapa dos pontos de descarte de eletroeletrônicos
+│       ├── chuvas/             previsão de chuva e avisos meteorológicos do INMET
 │       └── poluentes/          um recurso = uma pasta
 │           ├── page.py         a tela
 │           ├── config.toml     configurações da página
@@ -65,7 +67,8 @@ Observa-Jampa/
 │           └── ui/             componentes Streamlit
 └── tests/
     ├── poluentes/              testes de cada recurso
-    └── pontos_descarte/
+    ├── pontos_descarte/
+    └── chuvas/
 ```
 
 Regras do padrão:
@@ -120,12 +123,15 @@ As cores e a fonte ficam em `src/.streamlit/config.toml` (tema claro, azul `#1D4
 |---|---|---|
 | Qualidade do ar | Open-Meteo, CAMS / Copernicus Atmosphere Monitoring Service | CC BY 4.0 |
 | Pontos de descarte | Google My Maps “Descarte de resíduos eletroeletrônicos em João Pessoa/PB” | — |
+| Mapeamento de pontos de entrega voluntária (crédito na página inicial) | Projeto de extensão TREE — Tratamento de Resíduos Eletroeletrônicos (UFPB), https://www.cear.ufpb.br/tree/descarte-seus-residuos/ | — |
 | Bairros e endereços complementares, geocodificação e mapa | © colaboradores do OpenStreetMap (Nominatim) | ODbL |
 | Rotas | OSRM sobre dados do OpenStreetMap, servidor do FOSSGIS | ODbL |
 | Limite do município de João Pessoa | IBGE, Malha Municipal (API de malhas territoriais) | dados públicos |
 | Mapa de ruas | CARTO (estilo Voyager) sobre dados do OpenStreetMap | ODbL |
+| Previsão de chuva | Open-Meteo (Forecast API) | CC BY 4.0 |
+| Avisos meteorológicos | INMET — Instituto Nacional de Meteorologia | reprodução permitida com citação da fonte |
 
-Os valores de qualidade do ar são estimativas do modelo CAMS, não medições de sensores locais.
+Os valores de qualidade do ar são estimativas do modelo CAMS, não medições de sensores locais. A chuva da página de chuvas também é previsão de modelo, não chuva medida.
 
 ## Licença
 

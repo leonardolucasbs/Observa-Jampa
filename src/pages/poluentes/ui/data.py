@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 import streamlit as st
 
@@ -12,7 +14,19 @@ from pages.poluentes.services.air_quality_service import CurrentAirQuality
 CACHE_TTL_SECONDS = load_settings().dashboard.cache_ttl_seconds
 
 
-@st.cache_resource
+def _built_with_current_code(container: object) -> bool:
+    """Ao salvar um arquivo, o Streamlit reimporta os módulos, mas o `cache_resource` guarda o
+    container antigo, que passaria a criar objetos de classes velhas e o `cache_data` não
+    conseguiria serializá-los (PicklingError). Aí o container é descartado e reconstruído.
+
+    Consulta `sys.modules` em vez de `isinstance(..., Container)` porque o Streamlit mantém a
+    primeira função `validate` registrada, que enxergaria a classe antiga.
+    """
+    cls = type(container)
+    return getattr(sys.modules.get(cls.__module__), cls.__qualname__, None) is cls
+
+
+@st.cache_resource(validate=_built_with_current_code)
 def get_container() -> Container:
     container = build_container()
     configure_logging(container.settings.log_level)

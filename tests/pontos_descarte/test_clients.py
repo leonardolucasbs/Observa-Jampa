@@ -10,10 +10,8 @@ from pages.pontos_descarte.config import load_settings
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
-
 def load(name: str):
     return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
-
 
 def test_parse_osrm_table_skips_the_origin_column():
     estimates = parse_table(load("osrm_table.json"), expected=2)
@@ -35,7 +33,7 @@ def test_parse_osrm_route_returns_geojson_path():
 
 def test_parse_nominatim_search_builds_short_label():
     place = parse_search_result(load("nominatim_search.json")[0])
-    assert place.label == "Rua das Trincheiras, Centro, João Pessoa"  # sem "Região Geográfica..."
+    assert place.label == "Rua das Trincheiras, Centro, João Pessoa"
     assert place.latitude == pytest.approx(-7.1249869)
 
 
@@ -72,7 +70,7 @@ def test_nominatim_adds_city_hint_and_respects_rate_limit():
     client.search("Intermares, Cabedelo")
 
     assert session.calls[0]["params"]["q"] == "Rua das Trincheiras, João Pessoa, PB"
-    assert session.calls[1]["params"]["q"] == "Intermares, Cabedelo"  # já citou uma cidade da região
+    assert session.calls[1]["params"]["q"] == "Intermares, Cabedelo"
     assert session.calls[0]["params"]["bounded"] == 1
     assert sleeps == [pytest.approx(settings.geocoding.min_interval_seconds)]
 

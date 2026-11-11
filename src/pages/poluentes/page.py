@@ -1,5 +1,3 @@
-"""Página de qualidade do ar. Tudo o que ela usa (clients, domain, services, ui...) está nesta mesma pasta."""
-
 import streamlit as st
 
 from pages.poluentes.domain.models import POLLUTANT_LABELS, POLLUTANTS

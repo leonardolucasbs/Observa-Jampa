@@ -14,6 +14,7 @@ PAGES = [
     st.Page("pages/inicio/page.py", title="Início", icon="🏠", url_path="inicio", default=True),
     st.Page("pages/poluentes/page.py", title="Poluentes", icon="🌫️", url_path="poluentes"),
     st.Page("pages/pontos_descarte/page.py", title="Pontos de descarte", icon="♻️", url_path="pontos_descarte"),
+    st.Page("pages/chuvas/page.py", title="Chuvas e alertas", icon="🌧️", url_path="chuvas"),
 ]
 
 st.navigation(PAGES, position="top").run()

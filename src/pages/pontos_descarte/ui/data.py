@@ -4,6 +4,8 @@ As consultas externas (geocodificação e rotas) ficam em cache para respeitar o
 dos serviços públicos do OpenStreetMap e deixar a tela rápida ao mudar outros filtros.
 """
 
+import sys
+
 import streamlit as st
 
 from pages.pontos_descarte.bootstrap import Container, build_container
@@ -14,7 +16,19 @@ from pages.pontos_descarte.services.search_service import SearchResult, SearchSe
 ONE_DAY = 24 * 3600
 
 
-@st.cache_resource
+def _built_with_current_code(container: object) -> bool:
+    """Ao salvar um arquivo, o Streamlit reimporta os módulos, mas o `cache_resource` guarda o
+    container antigo, que passaria a criar objetos de classes velhas e o `cache_data` não
+    conseguiria serializá-los (PicklingError). Aí o container é descartado e reconstruído.
+
+    Consulta `sys.modules` em vez de `isinstance(..., Container)` porque o Streamlit mantém a
+    primeira função `validate` registrada, que enxergaria a classe antiga.
+    """
+    cls = type(container)
+    return getattr(sys.modules.get(cls.__module__), cls.__qualname__, None) is cls
+
+
+@st.cache_resource(validate=_built_with_current_code)
 def get_container() -> Container:
     return build_container()
 

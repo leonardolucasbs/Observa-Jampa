@@ -8,6 +8,14 @@ def format_mm(value: float | None) -> str:
     return f"{value:.1f}".replace(".", ",") + " mm"
 
 
+def format_mm_per_hour(value: float) -> str:
+    return f"{value:.1f}".replace(".", ",") + " mm/h"
+
+
+def format_hour(moment: datetime) -> str:
+    return f"{moment:%H}h"
+
+
 def format_day(day: date) -> str:
     return f"{WEEKDAYS[day.weekday()]} {day:%d/%m}"
 

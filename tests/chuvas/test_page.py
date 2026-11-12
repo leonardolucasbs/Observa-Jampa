@@ -33,8 +33,9 @@ def texts(elements) -> str:
     return "\n".join(str(element.value) for element in elements)
 
 
-def metrics(app: AppTest) -> dict[str, str]:
-    return {metric.label: metric.value for metric in app.metric}
+def metrics(app: AppTest) -> list[str]:
+    """Volumes dos três cards, na ordem: hoje, amanhã e próximos 7 dias."""
+    return [metric.value for metric in app.metric]
 
 
 def test_renders_the_three_cards_and_no_alerts_message(page, forecast_payload, alerts_payload):
@@ -42,13 +43,15 @@ def test_renders_the_three_cards_and_no_alerts_message(page, forecast_payload, a
 
     assert not app.exception
     assert app.title[0].value == "Previsão de chuva e alertas meteorológicos"
-    assert metrics(app) == {
-        "Hoje · Chuva prevista": "4,0 mm",
-        "Amanhã · Chuva prevista": "5,3 mm",
-        "Próximos 7 dias · Acumulado previsto": "21,2 mm",
-    }
+    assert metrics(app) == ["4,0 mm", "5,3 mm", "21,2 mm"]
+    headings = texts(app.markdown)
+    assert "#### 🌧️ Vai chover" in headings  # hoje e amanhã
+    assert "#### 🌧️ Chove em 6 de 7 dias" in headings
+    assert texts(app.markdown).count(":green-badge[Chuva fraca]") == 2  # intensidade de hoje e de amanhã
     captions = texts(app.caption)
-    assert "ter. 10/11" in captions and "ter. 10/11 a seg. 16/11" in captions  # período de cada valor
+    assert "Pico de 0,5 mm/h às 03h." in captions
+    assert "Vai chover quando a previsão do dia chega a 1,0 mm" in captions
+    assert "ter. 10/11" in texts(app.markdown) and "ter. 10/11 a seg. 16/11" in texts(app.markdown)  # período
     assert "até 86% em alguma hora do dia (não é volume)" in captions
     assert "última consulta bem-sucedida: 10/11/2026 às 22:39 (consultado agora)" in captions
     assert f"{NO_ALERTS}. Última consulta bem-sucedida: 10/11/2026 às 22:39." in texts(app.info)
@@ -101,7 +104,7 @@ def test_alerts_down_keeps_forecast_visible_and_never_says_there_are_no_alerts(p
 
     assert not app.exception
     assert "Não foi possível obter os avisos do INMET agora (Sem conexão com INMET)" in texts(app.error)
-    assert metrics(app)["Hoje · Chuva prevista"] == "4,0 mm"
+    assert metrics(app)[0] == "4,0 mm"
     assert NO_ALERTS not in texts(app.info)
 
 
@@ -111,10 +114,11 @@ def test_missing_forecast_values_show_no_data_instead_of_zero(page, forecast_pay
     app, _ = page(FakeSession(FakeResponse(forecast_payload)), FakeSession(FakeResponse(alerts_payload)))
 
     values = metrics(app)
-    assert values["Amanhã · Chuva prevista"] == "—"
-    assert values["Próximos 7 dias · Acumulado previsto"] == "15,9 mm"  # 21,2 − 5,3
+    assert values[1] == "—"
+    assert values[2] == "15,9 mm"  # 21,2 − 5,3
+    assert "#### ❔ Sem previsão" in texts(app.markdown)
     captions = texts(app.caption)
-    assert "Sem dado de previsão para este período." in captions
+    assert "Sem dado de previsão para este dia." in captions
     assert "Parcial: soma de 6 de 7 dias. Sem previsão para 11/11." in captions
 
 
@@ -131,7 +135,7 @@ def test_refresh_uses_cache_then_marks_old_data_as_stale(page, forecast_payload,
     clock.advance(minutes=40)  # passou o intervalo de 30 min: nova consulta, que falha
     app.run()
     assert len(forecast.calls) == 2
-    assert metrics(app)["Hoje · Chuva prevista"] == "4,0 mm"
+    assert metrics(app)[0] == "4,0 mm"
     warning = texts(app.warning)
     assert "Não foi possível atualizar agora (Open-Meteo não respondeu em 10 s)" in warning
     assert "última consulta bem-sucedida, em 10/11/2026 às 22:39 (há 45 min)" in warning

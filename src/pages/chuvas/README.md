@@ -1,6 +1,6 @@
 # Chuvas e alertas · Previsão de chuva e avisos meteorológicos
 
-Página do [ObservaJP](../../../README.md) com a previsão de chuva e o acompanhamento dos avisos meteorológicos oficiais para João Pessoa. Mostra quanto chove previsto hoje, amanhã e nos próximos 7 dias e lista os avisos do INMET vigentes ou futuros que abrangem o município.
+Página do [ObservaJP](../../../README.md) com a previsão de chuva e o acompanhamento dos avisos meteorológicos oficiais para João Pessoa. Mostra se vai chover hoje, amanhã e nos próximos 7 dias, com a intensidade da chuva prevista, e lista os avisos do INMET vigentes ou futuros que abrangem o município.
 
 > É previsão, não chuva medida, e não prevê alagamento em ruas específicas: para isso seriam necessários registros de ocorrências, sensores ou um modelo de risco validado. Um aviso do INMET indica condição meteorológica de risco, não confirma alagamento. A ausência de avisos não significa ausência de risco.
 
@@ -35,6 +35,26 @@ As duas fontes são independentes: cada uma tem sessão HTTP, cache e prazos pr�
 4. **Hoje** e **Amanhã** são o total de um dia. **Próximos 7 dias** é a soma dos totais diários de hoje até hoje + 6. Os dias são localizados pela data, não pela posição na resposta, e entram uma vez cada. Uma previsão do cache consultada ontem ainda serve para hoje, e o dia que falta aparece como faltante.
 5. Valor ausente, nulo, negativo ou que não é número fica como **sem dado**, nunca como zero. O card mostra "—" e "Sem dado de previsão". Se faltar algum dia na semana, o acumulado aparece como **parcial**, com os dias que faltam.
 6. `precipitation_probability_max` aparece separada, como "até X% em alguma hora do dia (não é volume)". Probabilidades nunca são somadas.
+
+## Veredito e intensidade
+
+A tela responde primeiro "vai chover?" e "quão forte?", e só depois mostra o volume em mm.
+
+1. **Vai chover:** o total previsto do dia chega a **1 mm**. Abaixo disso o card diz "Não deve chover" (no máximo garoa isolada). Sem previsão, diz "Sem previsão", nunca "não vai chover".
+2. **Intensidade:** vem do **pico em uma hora** (mm/h), não do total do dia. Um dia com 30 mm espalhados em 24 h é chuva fraca; 30 mm em 2 h é chuva forte. A escala é uma referência usual, não um critério oficial:
+
+   | Intensidade | Pico em uma hora |
+   |---|---|
+   | fraca | até 2,5 mm/h |
+   | moderada | de 2,5 a 10 mm/h |
+   | forte | de 10 a 50 mm/h |
+   | muito forte | acima de 50 mm/h |
+
+   A cor do selo acompanha a faixa (verde, laranja, vermelho). Se a fonte não trouxer a chuva por hora do dia, a página mostra que vai chover e avisa que a intensidade não foi calculada.
+3. **Pico:** cada card de hoje e amanhã mostra a hora de maior chuva prevista ("Pico de 0,5 mm/h às 03h").
+4. **Próximos 7 dias:** o veredito conta os dias com chuva prevista ("Chove em 6 de 7 dias"), considerando só os dias que têm previsão. O card também mostra o dia mais chuvoso.
+
+Os limites (`RAIN_THRESHOLD_MM` e `INTENSITY_FLOORS`) ficam em `domain/rain.py`. A legenda da tela é gerada a partir deles.
 
 ## Como os avisos são filtrados para João Pessoa
 

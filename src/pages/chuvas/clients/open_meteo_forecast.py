@@ -8,7 +8,7 @@ import requests
 
 from pages.chuvas.clients.http import SourceError, get_json
 from pages.chuvas.config import ForecastConfig, LocationConfig
-from pages.chuvas.domain.models import DailyRain, RainForecast
+from pages.chuvas.domain.models import DailyRain, HourlyRain, RainForecast
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,8 @@ def parse_forecast(payload: Any, expected_timezone: str) -> RainForecast:
     days = _dates(daily.get("time"))
     totals = _series(daily, "precipitation_sum", len(days))
     probabilities = _series(daily, "precipitation_probability_max", len(days))
-    hourly_totals = _hourly_totals(payload.get("hourly"))
+    hours = _hourly_entries(payload.get("hourly"))
+    hourly_totals = _hourly_totals(hours)
 
     entries = []
     for index, day in enumerate(days):
@@ -83,7 +84,7 @@ def parse_forecast(payload: Any, expected_timezone: str) -> RainForecast:
                 from_hourly=from_hourly,
             )
         )
-    return RainForecast(timezone=expected_timezone, days=tuple(entries))
+    return RainForecast(timezone=expected_timezone, days=tuple(entries), hours=tuple(hours))
 
 
 def _dates(raw: Any) -> list[date]:
@@ -109,24 +110,32 @@ def _series(block: dict[str, Any], name: str, length: int) -> list[Any]:
     return values
 
 
-def _hourly_totals(hourly: Any) -> dict[date, float]:
-    """Soma horária por data local, só para os dias com as 24 horas preenchidas."""
+def _hourly_entries(hourly: Any) -> list[HourlyRain]:
+    """Previsão hora a hora. Horário ou série inválidos descartam tudo: não dá para alinhar as horas."""
     if not isinstance(hourly, dict):
-        return {}
+        return []
     times, values = hourly.get("time"), hourly.get("precipitation")
     if not isinstance(times, list) or not isinstance(values, list) or len(times) != len(values):
-        return {}
-    by_day: dict[date, list[float | None]] = defaultdict(list)
+        return []
+    entries = []
     for raw_time, value in zip(times, values, strict=True):
         try:
-            day = datetime.fromisoformat(raw_time).date()
+            moment = datetime.fromisoformat(raw_time)
         except (TypeError, ValueError):
-            return {}
-        by_day[day].append(_non_negative(value))
+            return []
+        entries.append(HourlyRain(moment=moment, precipitation_mm=_non_negative(value)))
+    return entries
+
+
+def _hourly_totals(hours: list[HourlyRain]) -> dict[date, float]:
+    """Soma horária por data local, só para os dias com as 24 horas preenchidas."""
+    by_day: dict[date, list[float | None]] = defaultdict(list)
+    for hour in hours:
+        by_day[hour.moment.date()].append(hour.precipitation_mm)
     return {
-        day: round(sum(hours), 1)
-        for day, hours in by_day.items()
-        if len(hours) == HOURS_PER_DAY and all(hour is not None for hour in hours)
+        day: round(sum(values), 1)
+        for day, values in by_day.items()
+        if len(values) == HOURS_PER_DAY and all(value is not None for value in values)
     }
 
 

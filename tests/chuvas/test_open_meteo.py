@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 import pytest
 import requests
@@ -133,3 +133,11 @@ def test_unexpected_shape_becomes_source_error(settings, forecast_payload):
 
     with pytest.raises(SourceError):
         client(settings, FakeSession(FakeResponse(["não", "é", "objeto"]))).fetch()
+
+
+def test_parses_hour_by_hour_values_of_the_real_response(forecast_payload):
+    forecast = parse_forecast(forecast_payload, TIMEZONE)
+
+    assert len(forecast.hours) == 168
+    assert forecast.hours[0].moment == datetime(2026, 11, 10, 0, 0)
+    assert forecast.hours[0].precipitation_mm == 0.2

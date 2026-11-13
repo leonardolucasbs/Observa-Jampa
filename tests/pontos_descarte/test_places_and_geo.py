@@ -31,6 +31,29 @@ def test_canonical_neighborhood(raw, expected):
     assert canonical_neighborhood(raw) == expected
 
 
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        # Grafias que aparecem no CNEFE do IBGE
+        ("CRISTO", "Cristo Redentor"),
+        ("GEISEL", "Ernesto Geisel"),
+        ("PADDRE ZE", "Padre Zé"),
+        ("CRUZ DAS AMAS", "Cruz das Armas"),
+        ("JARDIN SAO PAULO", "Jardim São Paulo"),
+        ("JD CID UNIVERSITARIA", "Jardim Cidade Universitária"),
+        ("BAIRRO SAO JOSE", "São José"),
+        ("JARDIM", "Jardim"),  # vários bairros "Jardim ...": ambíguo, não adivinha
+        ("CIDADE DOS COLIBRIS", "Cidade dos Colibris"),  # fora da lista: só ajusta maiúsculas
+    ],
+)
+def test_canonical_neighborhood_fuzzy_fixes_abbreviations_and_typos(raw, expected):
+    assert canonical_neighborhood(raw, fuzzy=True) == expected
+
+
+def test_canonical_neighborhood_is_exact_by_default():
+    assert canonical_neighborhood("CRISTO") == "Cristo"
+
+
 def test_smart_title_keeps_codes_and_numbers():
     assert smart_title("RUA HENRIQUE VIEIRA, S/N") == "Rua Henrique Vieira, S/N"
     assert smart_title("AVENIDA HILTON SOUTO MAIOR, 4619-A, LOJA T-236 E T237") == (

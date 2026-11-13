@@ -6,6 +6,7 @@ import pytest
 from pages.pontos_descarte.clients.http import ServiceError
 from pages.pontos_descarte.clients.nominatim import NominatimClient, parse_search_result
 from pages.pontos_descarte.clients.osrm import parse_route, parse_table
+from pages.pontos_descarte.clients.photon import PhotonClient, parse_feature
 from pages.pontos_descarte.config import load_settings
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -79,3 +80,22 @@ def test_nominatim_returns_none_for_empty_results():
     client = NominatimClient(FakeSession([]), load_settings().geocoding, timeout_seconds=5, sleep=lambda s: None)
     assert client.search("lugar que não existe") is None
     assert client.search("   ") is None
+
+
+def test_parse_photon_feature_builds_short_label():
+    place = parse_feature(load("photon_search.json")["features"][0])
+    assert place.label == "Estacionamento Manaíra Shopping, Rua Monsenhor Antônio Afonso, Parque Verde, Cabedelo"
+    assert (place.latitude, place.longitude) == (-7.098928, -34.8467569)
+
+
+def test_photon_restricts_to_the_search_area_and_handles_empty_results():
+    settings = load_settings()
+    session = FakeSession(load("photon_search.json"))
+    PhotonClient(session, settings.geocoding, timeout_seconds=5).search("Manaíra Shopping")
+
+    params = session.calls[0]["params"]
+    west, north, east, south = settings.geocoding.viewbox
+    assert session.calls[0]["url"] == f"{settings.geocoding.photon_url}/api/"
+    assert params["bbox"] == f"{west},{south},{east},{north}"  # o Photon usa oeste, sul, leste, norte
+    assert PhotonClient(FakeSession({"features": []}), settings.geocoding, 5).search("lugar nenhum") is None
+    assert PhotonClient(FakeSession({}), settings.geocoding, 5).search("  ") is None

@@ -4,6 +4,7 @@ from pages.pontos_descarte.domain.text import (
     ADDRESS_ABBREVIATIONS,
     edit_distance,
     normalize,
+    phonetic,
     phrase_score,
     singularize,
     tokenize,
@@ -59,3 +60,12 @@ def test_phrase_score_requires_every_word_but_numbers_and_optional_words_only_ra
 def test_phrase_score_with_only_numbers_matches_postal_code():
     assert phrase_score(["58038", "680"], ["cep", "58038", "680"]) == 1.0
     assert phrase_score(["58038", "999"], ["cep", "58038", "680"]) == 0.0
+
+
+@pytest.mark.parametrize(
+    ("word", "expected"),
+    [("ruy", "rui"), ("luiz", "luis"), ("mello", "melo"), ("athayde", "ataide"), ("wagner", "vagner"),
+     ("jarrdim", "jardim"), ("philippe", "filipe"), ("paz", "paz"), ("2346", "2346")],
+)
+def test_phonetic_matches_old_spellings_of_names(word, expected):
+    assert phonetic(word) == expected

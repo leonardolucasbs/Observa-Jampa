@@ -1,0 +1,36 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "osm_type": "W",
+                "osm_id": 341639569,
+                "osm_key": "amenity",
+                "osm_value": "parking",
+                "type": "house",
+                "name": "Estacionamento Manaíra Shopping",
+                "street": "Rua Monsenhor Antônio Afonso",
+                "district": "Parque Verde",
+                "city": "Cabedelo",
+                "state": "Paraíba",
+                "country": "Brasil",
+                "postcode": "58036-853",
+                "countrycode": "BR",
+                "extent": [
+                    -34.8475838,
+                    -7.0984552,
+                    -34.8458349,
+                    -7.0993461
+                ]
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -34.8467569,
+                    -7.098928
+                ]
+            }
+        }
+    ]
+}

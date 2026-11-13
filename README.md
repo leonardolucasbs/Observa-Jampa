@@ -15,7 +15,7 @@ Cada tema ambiental é uma página do app. A barra de navegação fica no topo d
 |---|---|---|---|
 | Início (landing page) | Disponível | `src/pages/inicio/` | — |
 | Poluentes (qualidade do ar) | Disponível | [`src/pages/poluentes/`](src/pages/poluentes/README.md) | Open-Meteo / CAMS (Copernicus) |
-| Pontos de descarte de eletroeletrônicos | Disponível | [`src/pages/pontos_descarte/`](src/pages/pontos_descarte/README.md) | Google My Maps colaborativo, OpenStreetMap (Nominatim, OSRM), IBGE (limite do município) |
+| Pontos de descarte de eletroeletrônicos | Disponível | [`src/pages/pontos_descarte/`](src/pages/pontos_descarte/README.md) | Google My Maps colaborativo, OpenStreetMap (Nominatim, Photon, OSRM), IBGE (limite do município e endereços do Censo 2022) |
 | Chuvas e alertas (previsão de chuva e avisos meteorológicos) | Disponível | [`src/pages/chuvas/`](src/pages/chuvas/README.md) | Open-Meteo (previsão), INMET (avisos meteorológicos) |
 | Emissões de gases de efeito estufa | Planejada | — | — |
 | Resíduos sólidos | Planejada | — | — |
@@ -33,7 +33,7 @@ uv run streamlit run src/app.py
 
 O app abre em http://localhost:8501, na página inicial. O `backfill` só é necessário na primeira vez: ele carrega o histórico da qualidade do ar no banco local (`data/`, fora do git). Também dá para clicar em "Atualizar dados agora" na barra lateral da página de poluentes.
 
-A página de pontos de descarte já vem com os dados prontos (`src/pages/pontos_descarte/data/pontos_descarte.json`). Só rode `uv run python -m pages.pontos_descarte.prepare` se a planilha de pontos mudar.
+A página de pontos de descarte já vem com os dados prontos (`src/pages/pontos_descarte/data/`: pontos, limite do município e índice de endereços). Só rode `uv run python -m pages.pontos_descarte.prepare` se a planilha de pontos mudar.
 
 Para rodar os testes de todas as páginas, use `uv run pytest`. A coleta agendada e a configuração de cada página estão no README da página.
 

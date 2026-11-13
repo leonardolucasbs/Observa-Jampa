@@ -1,9 +1,20 @@
 from urllib.parse import urlencode
 
-from pages.pontos_descarte.domain.models import Coordinates, DisposalPoint
+from pages.pontos_descarte.domain.models import Coordinates, DisposalPoint, GeocodedPlace, GeocodePrecision
 
 # Serviço OSRM → modo de viagem do Google Maps (para o botão "Abrir no Google Maps").
 GOOGLE_TRAVEL_MODES = {"routed-car": "driving", "routed-foot": "walking", "routed-bike": "bicycling"}
+
+# Avisos para quando o endereço localizado não é exato. Endereço com número e resultados do
+# OpenStreetMap não ganham aviso.
+PRECISION_HINTS = {
+    GeocodePrecision.STREET: "posição aproximada: um trecho da rua, sem o número exato",
+    GeocodePrecision.POSTAL_CODE: "posição aproximada: centro da área do CEP",
+}
+
+
+def precision_hint(place: GeocodedPlace) -> str | None:
+    return PRECISION_HINTS.get(place.precision)
 
 
 def format_distance(meters: float) -> str:

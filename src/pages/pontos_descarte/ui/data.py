@@ -34,9 +34,17 @@ def get_container() -> Container:
 
 
 @st.cache_data(ttl=ONE_DAY, show_spinner=False)
+def geocode_candidates(query: str) -> tuple[GeocodedPlace, ...]:
+    """Lugares possíveis para o texto, do mais provável ao menos (índice do IBGE, depois OpenStreetMap).
+
+    Erros de rede sobem como ServiceError e não ficam em cache.
+    """
+    return tuple(get_container().geocoder.candidates(query))
+
+
 def geocode(query: str) -> GeocodedPlace | None:
-    """Erros de rede sobem como ServiceError e não ficam em cache."""
-    return get_container().geocoder.search(query)
+    candidates = geocode_candidates(query)
+    return candidates[0] if candidates else None
 
 
 def search(waste: str, neighborhood: str, address: str) -> SearchResult:

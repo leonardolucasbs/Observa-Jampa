@@ -5,7 +5,7 @@ import streamlit as st
 from pages.pontos_descarte.domain.models import MatchLevel
 from pages.pontos_descarte.domain.waste import EXAMPLES
 from pages.pontos_descarte.services.search_service import PlaceInterpretation, PlaceStrategy, SearchResult
-from pages.pontos_descarte.ui.formatting import format_distance
+from pages.pontos_descarte.ui.formatting import format_distance, precision_hint
 
 
 @dataclass(frozen=True)
@@ -92,8 +92,9 @@ def _place_note(label: str, place: PlaceInterpretation | None) -> str | None:
             return f"**{label}:** {', '.join(place.matched_names)}"
         return f"**{label}:** pontos com “{place.query}” no endereço ou no nome"
     if place.strategy == PlaceStrategy.NEARBY and place.reference and place.radius_m:
+        hint = precision_hint(place.reference)
         return (
             f"**{label}:** nenhum ponto cadastrado com esse nome; mostrando os pontos a até "
-            f"{format_distance(place.radius_m)} de {place.reference.label}"
+            f"{format_distance(place.radius_m)} de {place.reference.label}" + (f" ({hint})" if hint else "")
         )
     return None

@@ -13,9 +13,17 @@ from pages.pontos_descarte.services.routing_service import RouteResult
 from pages.pontos_descarte.services.search_service import SearchResult
 from pages.pontos_descarte.ui import data, geolocation
 from pages.pontos_descarte.ui.details import ROUTE_TARGET_KEY
-from pages.pontos_descarte.ui.formatting import format_distance, format_duration, full_address, google_maps_directions_url
+from pages.pontos_descarte.ui.formatting import (
+    format_distance,
+    format_duration,
+    full_address,
+    google_maps_directions_url,
+    precision_hint,
+)
 
 ORIGIN_KEY = "route_origin"
+CANDIDATES_KEY = "route_origin_candidates"  # outros lugares com o nome digitado ("Você quis dizer?")
+CANDIDATE_CHOICE_KEY = "route_origin_choice"
 GEO_REQUEST_KEY = "geo_request_id"
 GPS = "Usar GPS"
 TYPED = "Digitar endereço"
@@ -71,6 +79,9 @@ def _render_origin_picker() -> GeocodedPlace | None:
         if clear_col.button("Trocar", key="clear_origin", width="stretch"):
             _set_origin(None)
             st.rerun()
+        if hint := precision_hint(origin):
+            st.caption(hint[:1].upper() + hint[1:] + ".")
+        _render_other_candidates()
         return origin
 
     source = st.segmented_control("Sua localização", [GPS, TYPED], default=GPS, key="origin_source") or GPS
@@ -97,19 +108,47 @@ def _render_origin_picker() -> GeocodedPlace | None:
         submitted = st.form_submit_button("Buscar endereço", icon=":material/search:", width="stretch")
     if submitted and typed.strip():
         try:
-            place = data.geocode(typed)
+            places = data.geocode_candidates(typed)
         except ServiceError:
             st.warning("O serviço de mapas não respondeu. Tente de novo em instantes.", icon=":material/cloud_off:")
             return None
-        if place is None:
+        if not places:
             st.warning("Não encontramos esse endereço em João Pessoa e região.", icon=":material/location_off:")
             return None
-        return _set_origin(place)
+        # Já usa o mais provável; se houver outros com o mesmo nome, a pessoa troca na lista.
+        _set_origin(places[0], places)
+        st.rerun()
     return None
 
 
-def _set_origin(origin: GeocodedPlace | None) -> GeocodedPlace | None:
+def _render_other_candidates() -> None:
+    """Lista os outros lugares com o nome digitado, para trocar a origem sem digitar de novo."""
+    candidates: tuple[GeocodedPlace, ...] = st.session_state.get(CANDIDATES_KEY) or ()
+    if len(candidates) < 2:
+        return
+    st.selectbox(
+        "Não é esse lugar? Outros com esse nome",
+        range(len(candidates)),
+        format_func=lambda index: candidates[index].label,
+        key=CANDIDATE_CHOICE_KEY,
+        on_change=_use_chosen_candidate,
+    )
+
+
+def _use_chosen_candidate() -> None:
+    candidates = st.session_state.get(CANDIDATES_KEY) or ()
+    index = st.session_state.get(CANDIDATE_CHOICE_KEY)
+    if index is not None and index < len(candidates):
+        st.session_state[ORIGIN_KEY] = candidates[index]
+        st.session_state.pop(ROUTE_TARGET_KEY, None)
+
+
+def _set_origin(
+    origin: GeocodedPlace | None, candidates: tuple[GeocodedPlace, ...] = ()
+) -> GeocodedPlace | None:
     st.session_state[ORIGIN_KEY] = origin
+    st.session_state[CANDIDATES_KEY] = candidates
+    st.session_state.pop(CANDIDATE_CHOICE_KEY, None)
     st.session_state.pop(ROUTE_TARGET_KEY, None)
     return origin
 

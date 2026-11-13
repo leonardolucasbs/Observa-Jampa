@@ -36,4 +36,4 @@ def test_page_renders_and_filters_without_errors():
 def test_app_opens_on_the_landing_page():
     app = AppTest.from_file(APP, default_timeout=60).run()
     assert not app.exception
-    assert app.title[0].value == "ObservaJP"
+    assert app.title[0].value == "Observa Jampa"

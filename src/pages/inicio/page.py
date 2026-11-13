@@ -1,6 +1,9 @@
+from pathlib import Path
+
 import streamlit as st
 
 TREE_URL = "https://www.cear.ufpb.br/tree/descarte-seus-residuos/"
+LOGO = Path(__file__).resolve().parents[3] / "img" / "percursor-analysis.png"
 
 st.html(
     """
@@ -11,6 +14,7 @@ st.html(
         padding: 2.4rem 2.6rem 2.2rem;
       }
       .st-key-hero h1, .st-key-hero p { color: #FFFFFF; }
+      .st-key-hero_logo img { max-width: 46rem; margin-top: 1.5rem; border-radius: 12px; }
       [class*="st-key-feature_"] { border-top: 6px solid #1D4899; }
       [class*="st-key-feature_"] > div:last-child { margin-top: auto; }
       [class*="st-key-feature_"] [data-testid="stPageLink-NavLink"] {
@@ -34,17 +38,25 @@ st.html(
 )
 
 with st.container(key="hero"):
-    st.html(
-        '<div style="color:#FFFFFF;opacity:.85;font-size:.85rem;font-weight:700;letter-spacing:.12em;'
-        'text-transform:uppercase;">Observatório Ambiental de João Pessoa</div>'
-    )
-    st.title("ObservaJP", anchor=False)
-    st.html(
-        '<p style="color:#FFFFFF;font-size:1.2rem;line-height:1.5;max-width:46rem;margin:0;">'
-        "Dados ambientais da cidade reunidos num só lugar e explicados em linguagem simples: "
-        "a qualidade do ar que você respira, onde descartar eletroeletrônicos e a previsão de chuva "
-        "com os avisos meteorológicos oficiais.</p>"
-    )
+
+    col1, col2 = st.columns([1, 1], gap="medium")
+    with col1:
+
+        st.html(
+            '<div style="color:#FFFFFF;opacity:.85;font-size:.85rem;font-weight:700;letter-spacing:.12em;'
+            'text-transform:uppercase;">Observatório Ambiental de João Pessoa</div>'
+        )
+        st.title("Observa Jampa", anchor=False)
+        st.html(
+            '<p style="color:#FFFFFF;font-size:1.2rem;line-height:1.5;max-width:46rem;margin:0;">'
+            "Dados ambientais da cidade reunidos num só lugar e explicados em linguagem simples: "
+            "a qualidade do ar que você respira, onde descartar eletroeletrônicos e a previsão de chuva "
+            "com os avisos meteorológicos oficiais.</p>"
+        )
+    with col2:
+        if LOGO.exists():
+            with st.container(key="hero_logo"):
+                st.image(str(LOGO), width=1060)
 
 st.write("")
 st.subheader("O que você encontra aqui", anchor=False)

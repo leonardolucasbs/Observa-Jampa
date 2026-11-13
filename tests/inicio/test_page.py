@@ -13,7 +13,7 @@ def test_landing_page_presents_the_three_features():
     app = AppTest.from_file(APP, default_timeout=30).run()
 
     assert not app.exception
-    assert app.title[0].value == "ObservaJP"
+    assert app.title[0].value == "Observa Jampa"
     headings = [block.value for block in app.markdown if block.value.startswith("### ")]
     assert headings == ["### 🌫️ Qualidade do ar", "### ♻️ Pontos de descarte", "### 🌧️ Chuvas e alertas"]
     links = {link.proto.label: link.proto.page for link in app.get("page_link")}

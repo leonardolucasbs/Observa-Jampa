@@ -12,6 +12,14 @@ class DataConfig:
     sheet: str
     points: Path
     city_boundary: Path
+    addresses: Path
+
+
+@dataclass(frozen=True)
+class AddressesConfig:
+    base_url: str
+    max_candidates: int
+    cities: dict[str, str]  # cidade → arquivo do CNEFE
 
 
 @dataclass(frozen=True)
@@ -25,6 +33,7 @@ class HttpConfig:
 @dataclass(frozen=True)
 class GeocodingConfig:
     base_url: str
+    photon_url: str
     city_hint: str
     viewbox: tuple[float, float, float, float]  # oeste, norte, leste, sul
     min_interval_seconds: float
@@ -71,6 +80,7 @@ class Settings:
     log_level: str
     data: DataConfig
     http: HttpConfig
+    addresses: AddressesConfig
     geocoding: GeocodingConfig
     routing: RoutingConfig
     boundary: BoundaryConfig
@@ -88,6 +98,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
 
 def _build_settings(raw: dict[str, Any], base_dir: Path) -> Settings:
     data = raw["data"]
+    addresses = raw["addresses"]
     geocoding = raw["geocoding"]
     routing = raw["routing"]
     return Settings(
@@ -97,10 +108,17 @@ def _build_settings(raw: dict[str, Any], base_dir: Path) -> Settings:
             sheet=data["sheet"],
             points=base_dir / data["points"],
             city_boundary=base_dir / data["city_boundary"],
+            addresses=base_dir / data["addresses"],
         ),
         http=HttpConfig(**raw["http"]),
+        addresses=AddressesConfig(
+            base_url=addresses["base_url"].rstrip("/"),
+            max_candidates=addresses["max_candidates"],
+            cities=dict(addresses["cities"]),
+        ),
         geocoding=GeocodingConfig(
             base_url=geocoding["base_url"].rstrip("/"),
+            photon_url=geocoding["photon_url"].rstrip("/"),
             city_hint=geocoding["city_hint"],
             viewbox=tuple(geocoding["viewbox"]),
             min_interval_seconds=geocoding["min_interval_seconds"],

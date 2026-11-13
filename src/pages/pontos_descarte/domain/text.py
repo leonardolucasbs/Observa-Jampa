@@ -103,6 +103,22 @@ def singularize(word: str) -> str:
     return word
 
 
+_DOUBLE_LETTERS = re.compile(r"([a-z])\1+")
+
+
+def phonetic(word: str) -> str:
+    """Iguala grafias antigas e variações comuns em nomes de rua, para comparar.
+
+    "ruy" → "rui", "luiz" → "luis", "mello" → "melo", "athayde" → "ataide", "wagner" → "vagner".
+    Também absorve erros como "jarrdim". Recebe palavras já normalizadas por `normalize`.
+    """
+    word = word.replace("ph", "f").replace("th", "t").replace("y", "i").replace("w", "v")
+    word = _DOUBLE_LETTERS.sub(r"\1", word)
+    if len(word) > 3 and word.endswith("z"):
+        word = word[:-1] + "s"
+    return word
+
+
 def word_similarity(query: str, candidate: str) -> float:
     """Semelhança entre duas palavras já normalizadas, de 0 a 1.
 

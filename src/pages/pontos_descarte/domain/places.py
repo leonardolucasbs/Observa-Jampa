@@ -36,6 +36,7 @@ NEIGHBORHOOD_ALIASES: dict[str, str] = {
     "industrias": "Bairro das Indústrias",
     "altiplano": "Altiplano Cabo Branco",
     "jardim c universitaria": "Jardim Cidade Universitária",
+    "jardim cid universitaria": "Jardim Cidade Universitária",
     "cidade universitaria": "Jardim Cidade Universitária",
     "valentina": "Valentina de Figueiredo",
 }
@@ -59,8 +60,12 @@ def _key(name: str) -> str:
 _CANONICAL_BY_KEY: dict[str, str] = {_key(name): name for name in KNOWN_NEIGHBORHOODS} | NEIGHBORHOOD_ALIASES
 
 
-def canonical_neighborhood(raw: str | None) -> str | None:
-    """Padroniza o nome de um bairro: "MANGABEIRA I" → "Mangabeira", "JD OCEANIA" → "Jardim Oceania"."""
+def canonical_neighborhood(raw: str | None, *, fuzzy: bool = False) -> str | None:
+    """Padroniza o nome de um bairro: "MANGABEIRA I" → "Mangabeira", "JD OCEANIA" → "Jardim Oceania".
+
+    Com `fuzzy`, também corrige nomes abreviados ou com erro de digitação, desde que apontem para um
+    único bairro conhecido: "CRISTO" → "Cristo Redentor", "PADDRE ZE" → "Padre Zé".
+    """
     if not raw or not normalize(raw):
         return None
     key = _key(raw)
@@ -69,7 +74,22 @@ def canonical_neighborhood(raw: str | None) -> str | None:
     without_roman = _ROMAN_SUFFIX.sub("", key)
     if without_roman in _CANONICAL_BY_KEY:
         return _CANONICAL_BY_KEY[without_roman]
+    if fuzzy and (closest := _closest_known_neighborhood(raw)):
+        return closest
     return smart_title(raw)
+
+
+FUZZY_NEIGHBORHOOD_MIN_SCORE = 0.85
+
+
+def _closest_known_neighborhood(raw: str) -> str | None:
+    query = neighborhood_tokens(raw)
+    if not query:
+        return None
+    scores = {name: phrase_score(query, neighborhood_tokens(name)) for name in KNOWN_NEIGHBORHOODS}
+    best = max(scores.values())
+    winners = [name for name, score in scores.items() if score == best]
+    return winners[0] if best >= FUZZY_NEIGHBORHOOD_MIN_SCORE and len(winners) == 1 else None
 
 
 def smart_title(text: str) -> str:

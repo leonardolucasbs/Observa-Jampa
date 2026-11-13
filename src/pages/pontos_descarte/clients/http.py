@@ -31,6 +31,17 @@ def build_session(config: HttpConfig) -> requests.Session:
     return session
 
 
+def get_bytes(session: requests.Session, url: str, timeout: float) -> bytes:
+    """Baixa um arquivo (ex.: os zips do IBGE)."""
+    try:
+        response = session.get(url, timeout=timeout)
+    except requests.RequestException as exc:
+        raise ServiceError(f"Sem resposta de {url}: {exc}") from exc
+    if response.status_code != 200:
+        raise ServiceError(f"{url} respondeu HTTP {response.status_code}")
+    return response.content
+
+
 def get_json(session: requests.Session, url: str, params: dict | None, timeout: float) -> object:
     try:
         response = session.get(url, params=params, timeout=timeout)

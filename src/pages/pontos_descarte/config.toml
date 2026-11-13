@@ -6,6 +6,7 @@ spreadsheet = "data/pontos_descarte_eletroeletronicos_coordenadas_1.xlsx"
 sheet = "Pontos"
 points = "data/pontos_descarte.json"
 city_boundary = "data/limite_joao_pessoa.geojson"
+addresses = "data/enderecos.sqlite"
 
 [http]
 timeout_seconds = 15
@@ -14,9 +15,26 @@ backoff_factor = 0.5
 # Os serviços públicos do OpenStreetMap exigem um User-Agent que identifique o app.
 user_agent = "ObservaJP/0.1 (+https://github.com/leonardolucasbs/Observa-Jampa)"
 
+[addresses]
+# Endereços do Censo 2022 (CNEFE/IBGE): a primeira fonte da busca de endereços digitados.
+# O prepare baixa um arquivo por cidade e grava os trechos de rua em data/enderecos.sqlite.
+base_url = "https://ftp.ibge.gov.br/Cadastro_Nacional_de_Enderecos_para_Fins_Estatisticos/Censo_Demografico_2022/Arquivos_CNEFE/CSV/Municipio/25_PB"
+max_candidates = 5  # quantas opções mostrar quando o endereço digitado é ambíguo
+
+[addresses.cities]
+# cidade = arquivo do CNEFE (código IBGE do município + nome)
+"João Pessoa" = "2507507_JOAO_PESSOA.zip"
+"Cabedelo" = "2503209_CABEDELO.zip"
+"Bayeux" = "2501807_BAYEUX.zip"
+"Santa Rita" = "2513703_SANTA_RITA.zip"
+"Conde" = "2504603_CONDE.zip"
+
 [geocoding]
-# Nominatim: transforma endereço digitado em coordenada (e coordenada em bairro, no prepare).
+# Se o endereço não estiver no índice do IBGE (pontos de referência, ruas novas), ele é procurado
+# no Nominatim e, por último, no Photon, que tolera erros de digitação. Os dois usam o OpenStreetMap.
+# O Nominatim também transforma coordenada em bairro, no prepare.
 base_url = "https://nominatim.openstreetmap.org"
+photon_url = "https://photon.komoot.io"
 city_hint = "João Pessoa, PB"
 # Área de busca: João Pessoa e vizinhos (Cabedelo, Bayeux, Santa Rita). [oeste, norte, leste, sul]
 viewbox = [-35.02, -6.95, -34.77, -7.28]
@@ -54,5 +72,5 @@ height = 480
 city_fill_opacity = 0.2  # transparência do azul sobre o município (0 a 1)
 
 [texts]
-attribution = "Pontos de descarte: Google My Maps “Descarte de resíduos eletroeletrônicos em João Pessoa/PB”, com coordenadas conferidas ou geocodificadas. Bairros e endereços complementares, mapa e geocodificação: © colaboradores do OpenStreetMap (ODbL). Rotas: OSRM / FOSSGIS. Limite do município: IBGE, Malha Municipal."
+attribution = "Pontos de descarte: Google My Maps “Descarte de resíduos eletroeletrônicos em João Pessoa/PB”, com coordenadas conferidas ou geocodificadas. Endereços digitados: IBGE, CNEFE do Censo Demográfico 2022. Bairros e endereços complementares, mapa e geocodificação: © colaboradores do OpenStreetMap (ODbL), via Nominatim e Photon. Rotas: OSRM / FOSSGIS. Limite do município: IBGE, Malha Municipal."
 disclaimer = "As informações vêm de fontes públicas e podem estar desatualizadas. Confirme horário e itens aceitos com o local antes de ir."

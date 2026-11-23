@@ -27,11 +27,10 @@ Pré-requisito: [uv](https://docs.astral.sh/uv/). O próprio uv baixa o Python 3
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 uv sync
-uv run python -m pages.poluentes.backfill --days 90
 uv run streamlit run src/app.py
 ```
 
-O app abre em http://localhost:8501, na página inicial. O `backfill` só é necessário na primeira vez: ele carrega o histórico da qualidade do ar no banco local (`data/`, fora do git). Também dá para clicar em "Atualizar dados agora" na barra lateral da página de poluentes.
+O app abre em http://localhost:8501, na página inicial. A qualidade do ar se atualiza sozinha. Na primeira visita à página de poluentes, o app carrega 90 dias de histórico no banco local (`data/`, fora do git). Depois, coleta de novo sempre que a última coleta tem mais de 1 hora. Os detalhes estão no README da página.
 
 A página de pontos de descarte já vem com os dados prontos (`src/pages/pontos_descarte/data/`: pontos, limite do município e índice de endereços). Só rode `uv run python -m pages.pontos_descarte.prepare` se a planilha de pontos mudar.
 

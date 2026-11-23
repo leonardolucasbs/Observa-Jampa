@@ -30,9 +30,18 @@ class AirQualityConfig:
 
 
 @dataclass(frozen=True)
+class AutoCollectConfig:
+    interval_seconds: int
+    retry_after_failure_seconds: int
+    backfill_days: int
+    wait_seconds: float
+
+
+@dataclass(frozen=True)
 class DashboardConfig:
     period_options: tuple[int, ...]
     cache_ttl_seconds: int
+    rerun_seconds: int
     attribution: str
     disclaimer: str
     plain_disclaimer: str
@@ -46,6 +55,7 @@ class Settings:
     database_path: Path
     http: HttpConfig
     air_quality: AirQualityConfig
+    auto_collect: AutoCollectConfig
     who_guidelines_24h: dict[str, float]
     dashboard: DashboardConfig
     locations: tuple[Location, ...]
@@ -73,10 +83,12 @@ def _build_settings(raw: dict[str, Any], base_dir: Path) -> Settings:
         database_path=database_path,
         http=HttpConfig(**raw["http"]),
         air_quality=AirQualityConfig(**raw["air_quality"]),
+        auto_collect=AutoCollectConfig(**raw["auto_collect"]),
         who_guidelines_24h={key: float(value) for key, value in raw["who_guidelines_24h"].items()},
         dashboard=DashboardConfig(
             period_options=tuple(raw["dashboard"]["period_options"]),
             cache_ttl_seconds=raw["dashboard"]["cache_ttl_seconds"],
+            rerun_seconds=raw["dashboard"]["rerun_seconds"],
             attribution=raw["dashboard"]["attribution"],
             disclaimer=raw["dashboard"]["disclaimer"],
             plain_disclaimer=raw["dashboard"]["plain_disclaimer"],

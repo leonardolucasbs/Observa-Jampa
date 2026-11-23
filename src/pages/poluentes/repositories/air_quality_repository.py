@@ -75,6 +75,11 @@ class AirQualityRepository:
         with self._engine.connect() as connection:
             return int(connection.execute(select(func.count()).select_from(air_quality_table)).scalar_one())
 
+    def last_fetched_at(self) -> datetime | None:
+        """Hora da coleta mais recente gravada (por este app ou pela tarefa agendada); None com o banco vazio."""
+        with self._engine.connect() as connection:
+            return connection.execute(select(func.max(air_quality_table.c.fetched_at))).scalar_one()
+
     def _base_select(self) -> Select:
         return select(
             location_table.c.slug,

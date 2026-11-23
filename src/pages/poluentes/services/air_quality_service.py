@@ -88,6 +88,9 @@ class AirQualityService:
     def has_data(self) -> bool:
         return self._repository.count() > 0
 
+    def last_collected_at(self) -> datetime | None:
+        return self._repository.last_fetched_at()
+
     def _observed_since(self, start: datetime, slugs: list[str] | None) -> pd.DataFrame:
         frame = self._repository.find_between(start, self._clock(), slugs)
         return frame[~frame["is_forecast"]] if not frame.empty else frame

@@ -16,6 +16,13 @@ collect_past_days = 2
 forecast_days = 1
 max_past_days = 92
 
+[auto_collect]
+# A própria tela dispara a coleta quando a última gravada no banco ficou velha. Sem botão e sem agendador.
+interval_seconds = 3600  # nova coleta quando a última tem mais de 1 h (a Open-Meteo entrega um valor por hora)
+retry_after_failure_seconds = 600  # depois de uma falha, espera 10 min antes de tentar de novo
+backfill_days = 90  # banco vazio: a primeira coleta carrega este histórico
+wait_seconds = 5  # a tela espera a coleta por até 5 s; se demorar mais, mostra o que já está no banco
+
 [who_guidelines_24h]
 pm2_5 = 15
 nitrogen_dioxide = 25
@@ -23,6 +30,7 @@ nitrogen_dioxide = 25
 [dashboard]
 period_options = [7, 30, 90]
 cache_ttl_seconds = 300
+rerun_seconds = 300  # a tela aberta se redesenha a cada 5 min e verifica se há coleta a fazer
 attribution = "Dados de qualidade do ar: Open-Meteo, CAMS / Copernicus Atmosphere Monitoring Service — licença CC BY 4.0"
 disclaimer = "Os valores são estimativas do modelo de previsão CAMS (resolução de dezenas de km), não medições de sensores locais."
 plain_disclaimer = "É uma estimativa para a cidade como um todo, feita por um modelo de previsão (CAMS / Copernicus). Não é a medição de um sensor no seu bairro."

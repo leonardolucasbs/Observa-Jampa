@@ -10,7 +10,7 @@ from pages.poluentes.ui.theme import text_color_on
 
 def render_verdict(current: CurrentAirQuality | None, note: str) -> None:
     if current is None:
-        st.info("Ainda não há dados para a cidade. Clique em “Atualizar dados agora” na barra lateral.")
+        st.info("Ainda não há dados para a cidade. A coleta automática tenta de novo, e a página se atualiza sozinha.")
         return
     guidance = guidance_for(current.band.label)
     index_text = "Sem índice no momento" if current.us_aqi is None else f"Índice {current.us_aqi} numa escala de 0 a 500"

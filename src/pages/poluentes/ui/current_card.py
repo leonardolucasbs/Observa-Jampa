@@ -7,7 +7,7 @@ from pages.poluentes.ui.theme import text_color_on
 
 def render_current_card(current: CurrentAirQuality | None) -> None:
     if current is None:
-        st.info("Ainda não há dados para a localização principal. Rode o backfill ou clique em “Atualizar dados agora”.")
+        st.info("Ainda não há dados para a localização principal. A coleta automática tenta de novo, e a página se atualiza sozinha.")
         return
     text_color = text_color_on(current.band.label)
     aqi_text = "—" if current.us_aqi is None else str(current.us_aqi)

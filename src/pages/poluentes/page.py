@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import streamlit as st
 
 from pages.poluentes.domain.models import POLLUTANT_LABELS, POLLUTANTS
@@ -5,30 +7,33 @@ from pages.poluentes.ui import (
     capitals,
     charts,
     city_map,
+    collection_status,
     current_card,
     data,
     footer,
     history,
     period,
-    sidebar,
     verdict,
 )
 
-settings = data.get_container().settings
+container = data.get_container()
+settings = container.settings
 primary = settings.primary_location
 primary_name = next(location.name for location in settings.locations if location.slug == primary)
 period_options = settings.dashboard.period_options
-refresh_requested = sidebar.render_sidebar()
-
-if refresh_requested:
-    with st.spinner("Coletando dados da Open-Meteo..."):
-        sidebar.render_refresh_feedback(data.refresh_now())
 
 st.title(f"Qualidade do ar em {primary_name}")
 
-if not data.has_data():
-    st.info("Banco vazio. Rode `uv run python -m pages.poluentes.backfill --days 90` ou clique em “Atualizar dados agora”.")
-else:
+
+@st.fragment(run_every=timedelta(seconds=settings.dashboard.rerun_seconds))
+def dashboard() -> None:
+    """Redesenha sozinho: a cada execução, confere se há coleta a fazer e mostra os dados mais novos do banco."""
+    status = collection_status.keep_data_fresh(data.get_auto_collector(), settings.auto_collect)
+    if not data.has_data():
+        collection_status.render_no_data(status, settings.auto_collect)
+        return
+    collection_status.render_collection_status(status, settings.auto_collect, container.clock(), primary_name)
+
     summary_tab, technical_tab = st.tabs(["Resumo", "Detalhes técnicos"])
 
     with summary_tab:
@@ -71,4 +76,6 @@ else:
             st.subheader("Mapa · AQI atual")
             city_map.render_city_map(data.load_current_by_location())
 
+
+dashboard()
 footer.render_footer(settings.dashboard.attribution)

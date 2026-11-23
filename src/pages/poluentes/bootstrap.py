@@ -4,7 +4,7 @@ from sqlalchemy import Engine
 
 from pages.poluentes.clients.http import build_session
 from pages.poluentes.clients.open_meteo_air_quality import OpenMeteoAirQualityClient
-from pages.poluentes.clock import local_clock
+from pages.poluentes.clock import Clock, local_clock
 from pages.poluentes.config import Settings, load_settings
 from pages.poluentes.etl.pipeline import AirQualityIngestion
 from pages.poluentes.repositories.air_quality_repository import AirQualityRepository
@@ -16,14 +16,15 @@ from pages.poluentes.services.air_quality_service import AirQualityService
 @dataclass(frozen=True)
 class Container:
     settings: Settings
+    clock: Clock
     engine: Engine
     air_quality_ingestion: AirQualityIngestion
     air_quality_service: AirQualityService
 
 
-def build_container(settings: Settings | None = None) -> Container:
+def build_container(settings: Settings | None = None, clock: Clock | None = None) -> Container:
     settings = settings or load_settings()
-    clock = local_clock(settings.timezone)
+    clock = clock or local_clock(settings.timezone)
     engine = create_db_engine(settings.database_path)
     measurement_repository = AirQualityRepository(engine)
     client = OpenMeteoAirQualityClient(
@@ -35,6 +36,7 @@ def build_container(settings: Settings | None = None) -> Container:
     )
     return Container(
         settings=settings,
+        clock=clock,
         engine=engine,
         air_quality_ingestion=AirQualityIngestion(
             client=client,

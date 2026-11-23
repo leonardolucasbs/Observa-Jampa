@@ -33,6 +33,22 @@ def test_upsert_updates_existing_row_instead_of_duplicating(engine: Engine) -> N
     assert rows.loc[0, "fetched_at"] == revised_fetch
 
 
+def test_last_fetched_at_is_the_most_recent_collection(engine: Engine) -> None:
+    ids = LocationRepository(engine).sync([JOAO_PESSOA, RECIFE])
+    repository = AirQualityRepository(engine)
+    assert repository.last_fetched_at() is None
+
+    repository.upsert(
+        [
+            make_reading("joao-pessoa", fetched_at=datetime(2026, 10, 30, 13, 5)),
+            make_reading("recife", fetched_at=datetime(2026, 10, 30, 14, 5)),
+        ],
+        ids,
+    )
+
+    assert repository.last_fetched_at() == datetime(2026, 10, 30, 14, 5)
+
+
 def test_location_sync_is_idempotent_and_updates_name(engine: Engine) -> None:
     repository = LocationRepository(engine)
     first = repository.sync([JOAO_PESSOA])

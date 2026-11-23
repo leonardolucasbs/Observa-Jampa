@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -49,3 +49,16 @@ def make_reading(
         is_forecast=is_forecast,
         fetched_at=fetched_at,
     )
+
+
+class FakeClock:
+    """Relógio controlado pelo teste. Começa no dia da fixture `open_meteo_multi.json`."""
+
+    def __init__(self, now: datetime = datetime(2026, 10, 30, 12, 25)) -> None:
+        self.now = now
+
+    def __call__(self) -> datetime:
+        return self.now
+
+    def advance(self, **delta: float) -> None:
+        self.now += timedelta(**delta)

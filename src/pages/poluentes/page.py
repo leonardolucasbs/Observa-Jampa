@@ -6,7 +6,6 @@ from pages.poluentes.domain.models import POLLUTANT_LABELS, POLLUTANTS
 from pages.poluentes.ui import (
     capitals,
     charts,
-    city_map,
     collection_status,
     current_card,
     data,
@@ -63,18 +62,14 @@ def dashboard() -> None:
         st.subheader("Padrão por hora do dia")
         charts.render_hourly_profile(data.load_hourly_profile(primary, technical_days))
 
-        left, right = st.columns(2)
-        with left:
-            st.subheader("Comparativo entre capitais")
-            pollutant = st.selectbox(
-                "Poluente",
-                options=list(POLLUTANTS),
-                format_func=lambda key: POLLUTANT_LABELS[key],
-            )
-            charts.render_city_comparison(data.load_city_comparison(pollutant, technical_days), pollutant, primary)
-        with right:
-            st.subheader("Mapa · AQI atual")
-            city_map.render_city_map(data.load_current_by_location())
+        st.subheader("Comparativo entre capitais")
+        pollutant = st.selectbox(
+            "Poluente",
+            options=list(POLLUTANTS),
+            format_func=lambda key: POLLUTANT_LABELS[key],
+            width=320,
+        )
+        charts.render_city_comparison(data.load_city_comparison(pollutant, technical_days), pollutant, primary)
 
 
 dashboard()

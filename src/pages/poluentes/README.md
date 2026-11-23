@@ -52,7 +52,7 @@ Atualizar mais de uma vez por hora não traz dado novo: a API entrega um valor p
 A tela tem duas abas:
 
 - **Resumo** (aberta por padrão) é para quem não é da área. Responde em linguagem simples: *o ar está bom agora?* (cartão colorido com escala de 0 a 500), *como foi nos últimos dias?* (calendário) e *como estão as outras capitais?*.
-- **Detalhes técnicos** traz os gráficos em µg/m³ (tendência com diretrizes da OMS, padrão por hora, comparativo e mapa).
+- **Detalhes técnicos** traz os gráficos em µg/m³ (tendência com diretrizes da OMS, padrão por hora e comparativo entre capitais).
 
 Os textos em linguagem simples de cada faixa ficam em `domain/guidance.py`. No `config.toml`, `plain_disclaimer` é o aviso sobre a origem dos dados que aparece no Resumo.
 
